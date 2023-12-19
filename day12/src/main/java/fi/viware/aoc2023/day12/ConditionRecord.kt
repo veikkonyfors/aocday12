@@ -17,24 +17,51 @@ class ConditionRecord(val input: String) {
         return groups.getNumBroken() - condition.getNumFixedBroken()
     }
 
-    fun getNumVariationsToAddBroken(): Int{
-        val slotsToLocateBroken = condition.getPossiblyBrokenIndices()
-        val numBrokenToAdd = getNumBrokenToAddIntoCondition()
-        val n = permutations(condition.getPossiblyBrokenIndices().size, getNumBrokenToAddIntoCondition())
-        return n
-    }
+    fun getNumPossibilitiesToAddBroken(): Int{
 
-    fun factorial(n: Int): Int {
-        var result = 1
-        for (i in 2..n) {
-            result *= i
+        val hashCount = condition.getNumFixedBroken()
+        val totalSlots = condition.i.length
+        val array = CharArray(totalSlots) { '.' }
+        val candidateIndexesForBroken = condition.getPossiblyBrokenIndices()
+        var conditionArray: CharArray
+
+        var permutations: MutableList<CharArray> = mutableListOf()
+        var conditionsList: MutableList<CharArray> = mutableListOf()
+
+
+        generatePermutations(array, hashCount, 0, permutations)
+
+        var s = ""
+        var sc = ""
+        permutations.forEach{
+            s += String(it) + "\n"
+            conditionArray = condition.i.toCharArray()
+            it.forEachIndexed { index, c ->
+                conditionArray[candidateIndexesForBroken[index]]=c
+            }
+            conditionsList.add(conditionArray)
+            sc += String(conditionArray) + "\n"
         }
-        return result
+        println("${s} ${sc}")
+
+        return sc.length
     }
 
-    fun permutations(n: Int, k: Int): Int {
-        require(n >= k) { "n must be greater than or equal to k" }
-        return factorial(n) / factorial(n - k)
+    fun generatePermutations(array: CharArray, hashCount: Int, index: Int, permutations: MutableList<CharArray> ){
+        if (index == array.size) {
+            if (array.count { it == '#' } == hashCount) {
+                //println(array.joinToString(""))
+                permutations.add(array.copyOf())
+            }
+            return
+        }
+
+        array[index] = '#'
+        generatePermutations(array, hashCount, index + 1, permutations)
+
+        array[index] = '.'
+        generatePermutations(array, hashCount, index + 1, permutations)
+
     }
 
     override fun toString(): String {

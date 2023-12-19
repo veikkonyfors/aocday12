@@ -31,28 +31,28 @@ class Day12Test(){
         println("$n")
         assertEquals(3, n)
 
-        n = day12.conditionRecord.getNumVariationsToAddBroken()
+        n = day12.conditionRecord.getNumPossibilitiesToAddBroken()
         println("$n")
         assertEquals(4, n)
 
 
     }
 
-    fun generatePermutations(array: CharArray, hashCount: Int, index: Int): CharArray {
+    fun generatePermutations(array: CharArray, hashCount: Int, index: Int, permutations: MutableList<CharArray> ){
         if (index == array.size) {
             if (array.count { it == '#' } == hashCount) {
                 //println(array.joinToString(""))
+                permutations.add(array.copyOf())
             }
-            return array
+            return
         }
 
         array[index] = '#'
-        generatePermutations(array, hashCount, index + 1)
+        generatePermutations(array, hashCount, index + 1, permutations)
 
         array[index] = '.'
-        generatePermutations(array, hashCount, index + 1)
+        generatePermutations(array, hashCount, index + 1, permutations)
 
-        return array
     }
 
     @Test
@@ -61,10 +61,26 @@ class Day12Test(){
         val totalSlots = 5
         val array = CharArray(totalSlots) { '.' }
         val candidateIndexesForBroken = intArrayOf(1, 2, 5, 6, 10)
+        var conditionArray = ".??..??...?##.".toCharArray()
 
-        val a = generatePermutations(array, hashCount, 0)
+        var permutations: MutableList<CharArray> = mutableListOf()
+        var conditionsList: MutableList<CharArray> = mutableListOf()
 
-        println("${a.joinToString { it.toString() }}")
+
+        generatePermutations(array, hashCount, 0, permutations)
+
+        var s = ""
+        var sc = ""
+        permutations.forEach{
+            s += String(it) + "\n"
+            conditionArray = ".??..??...?##.".toCharArray()
+            it.forEachIndexed { index, c ->
+                conditionArray[candidateIndexesForBroken[index]]=c
+            }
+            conditionsList.add(conditionArray)
+            sc += String(conditionArray) + "\n"
+        }
+        println("${s} ${sc}")
     }
 }
 
