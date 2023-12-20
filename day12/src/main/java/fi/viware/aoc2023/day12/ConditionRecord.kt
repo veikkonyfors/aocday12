@@ -19,10 +19,11 @@ class ConditionRecord(val input: String) {
 
     fun getNumPossibilitiesToAddBroken(): Int{
 
-        val hashCount = condition.getNumFixedBroken()
-        val totalSlots = condition.i.length
-        val array = CharArray(totalSlots) { '.' }
+        val hashCount = getNumBrokenToAddIntoCondition()
         val candidateIndexesForBroken = condition.getPossiblyBrokenIndices()
+        val totalSlots = candidateIndexesForBroken.size
+        val array = CharArray(totalSlots) { '.' }
+
         var conditionArray: CharArray
 
         var permutations: MutableList<CharArray> = mutableListOf()
@@ -42,9 +43,11 @@ class ConditionRecord(val input: String) {
             conditionsList.add(conditionArray)
             sc += String(conditionArray) + "\n"
         }
-        println("${s} ${sc}")
+        //println("${s} ${sc}")
 
-        return sc.length
+        val n = getNumMatches(conditionsList, groups)
+
+        return n
     }
 
     fun generatePermutations(array: CharArray, hashCount: Int, index: Int, permutations: MutableList<CharArray> ){
@@ -61,7 +64,32 @@ class ConditionRecord(val input: String) {
 
         array[index] = '.'
         generatePermutations(array, hashCount, index + 1, permutations)
+    }
 
+    fun getNumMatches(conditionsList: MutableList<CharArray> = mutableListOf(), groups: Groups):Int {
+
+        var n = 0
+
+        conditionsList.forEach {
+            if (isMatch(it, groups)){
+                //println("$it")
+                n += 1
+            }
+        }
+
+        return n
+    }
+
+    fun isMatch(condition: CharArray, groups: Groups): Boolean {
+        var b = false
+        val conditionString = condition.joinToString(separator = "") { it.toString() }
+        val groupsRegex = groups.toRegex()
+
+        if (conditionString.matches(groupsRegex)){
+            println("$conditionString, $groupsRegex")
+            b = true
+        }
+        return b
     }
 
     override fun toString(): String {
